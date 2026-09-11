@@ -19,7 +19,8 @@
     "google-auth-library": "^9.11.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.4.4",
-    "multer": "^2.0.1"
+    "multer": "^2.0.1",
+    "uuid": "^14.0.2"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
