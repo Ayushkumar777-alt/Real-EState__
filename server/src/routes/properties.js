@@ -7,10 +7,12 @@ import { requireAuth } from '../middleware/auth.js'
 
 const router = express.Router()
 
-const uploadsDir = path.resolve('uploads')
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true })
-}
+const uploadsDir = process.env.VERCEL ? '/tmp/uploads' : path.resolve('uploads')
+try {
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true })
+  }
+} catch { /* read-only filesystem on serverless — file uploads won't persist */ }
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadsDir),
