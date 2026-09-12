@@ -1,5 +1,4 @@
 import mongoose from 'mongoose'
-import { MongoMemoryServer } from 'mongodb-memory-server'
 import Property from './models/Property.js'
 import { sampleProperties } from './data/sampleProperties.js'
 
@@ -24,6 +23,7 @@ export async function connectDB() {
     }
     console.warn(`Could not connect to MongoDB at ${uri} (${err.message}). Starting In-Memory MongoDB server...`)
     try {
+      const { MongoMemoryServer } = await import('mongodb-memory-server')
       mongodInstance = await MongoMemoryServer.create()
       const mongoUri = mongodInstance.getUri()
       await mongoose.connect(mongoUri)
