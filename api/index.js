@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import path from 'path'
@@ -9,23 +10,13 @@ import recommendRoutes from '../server/src/routes/recommend.js'
 
 const app = express()
 
-const corsOrigins = (process.env.CLIENT_URL || '*').split(',').map((v) => v.trim())
-app.use(cors({ origin: corsOrigins, credentials: true }))
+app.use(cors({ origin: '*', credentials: true }))
 app.use(express.json())
 
-// Ensure MongoDB connection for every serverless request
-app.use(async (req, res, next) => {
-  try {
-    await connectDB()
-    next()
-  } catch (err) {
-    console.error('Database connection error in Vercel function:', err)
-    res.status(500).json({ message: 'Database connection failure. Please check MONGODB_URI in Vercel settings.', error: err.message })
-  }
-})
+app.use('/uploads', express.static(path.resolve('server/uploads')))
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', environment: 'vercel-serverless' })
+  res.json({ status: 'ok' })
 })
 
 app.use('/api/auth', authRoutes)
@@ -33,4 +24,11 @@ app.use('/api/properties', propertyRoutes)
 app.use('/api/sample-properties', samplePropertyRoutes)
 app.use('/api/recommend', recommendRoutes)
 
-export default app
+export default async function handler(req, res) {
+  try {
+    await connectDB()
+  } catch (err) {
+    console.error('DB Connection error in handler:', err)
+  }
+  return app(req, res)
+}
